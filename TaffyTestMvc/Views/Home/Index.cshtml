@@ -1,0 +1,182 @@
+﻿@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Index</title>
+</head>
+<body>
+    @*<?php
+$userInfo = $db->get_row("SELECT * FROM " . DB_PREFIX . "users WHERE id='".$_SESSION['user_id']."'");
+?>*@
+<style>
+p{ margin:10px 0px;}
+ul{ margin-left:15px;}
+ul li{ line-height:20px;}
+</style>
+<link href="/vttstyle.css" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="/js/taffy.js"></script>
+        
+        <script type="text/javascript">
+
+            var product = TAFFY([{ code: "VPR", filename: "Pressure Regulators" }, { code: "VFMFGR", title: "Flow Meters Flow Gauge Regulators", filename: "VFMFGR.PDF" }]);
+
+
+            var brand_industry = TAFFY([{ brand: "V", industry: "1", code: "VPR" }, { brand: "V", industry: "2", code: "VPR" }, { brand: "V", industry: "3", code: "VPR" }
+                , { brand: "V", industry: "1", code: "VFMFGR" }, { brand: "V", industry: "2", code: "VFMFGR" }, { brand: "V", industry: "3", code: "VFMFGR" }
+                , { brand: "V", industry: "1", code: "VFMFGR" }, { brand: "V", industry: "1", code: "VFMFGR" }
+                , { brand: "VTD", industry: "1", code: "VPR" }, { brand: "VTD", industry: "3", code: "VPR" }, { brand: "VTD", industry: "1", code: "VPR" }]);
+
+            var brand = TAFFY([{ brand: "V", filename: "VIO.PDF", pdf_title: "Victor Instructor Guide" }, { brand: "V", title: "Victor", filename: "VIO.PDF" }, { brand: "V", title: "Victor", filename: "VBO.PDF" }, { brand: "VTD", filename: "VTDIOG.PDF", title: "Victor Thermal Dynamics" }, { brand: "VTD", title: "Victor Thermal Dynamics", filename: "VTDIO.PDF" }, { brand: "VTD", title: "Victor Thermal Dynamics", filename: "VTDBO.PDF" }]);
+
+            var industry = TAFFY([{ industry: "1", title: "AEROSPACE", filename: "Aircraft.PDF" }, { industry: "2", title: "AGGRICULTURE", filename: "AGG.PDF" }, { industry: "3", title: "CONSTRUCTION", filename: "CONST.PDF" }
+                , { industry: "4", title: "AUTOMOTIVE", filename: "AUTOMOTIVE.PDF" }, { industry: "5", title: "HOME IMPROVEMENT", filename: "DIY.PDF" }]);
+
+
+
+            function getPdfList(brands, i) {
+
+                // --- THIS GIVES YOU PRODUCT PDFS
+
+                // brand : V, industry: AERO - I need a list of products
+
+                var V_1 = brand_industry({ brand: brands, industry: i });
+                var codes = V_1.select("code");
+                //   console.log(codes);
+
+                // given my list of products, I need the list of PDFs
+
+                var pdfs = product({ code: codes }).select("filename");
+
+                //    console.log(pdfs);
+
+
+                // --- 
+
+                // --- THIS GIVES YOU BRAND PDFS
+
+                var brand_pdfs = brand({ brand: brands }).select("filename");
+
+                //   console.log(brand_pdfs);
+                // return brand_pdfs;
+
+                // ---
+
+                // --- THIS GIVES YOU INDUSTRY PDFS
+
+                var industry_pdfs = industry({ industry: i }).select("filename");
+                //   console.log(industry_pdfs);
+                //return industry_pdfs;
+                // ---
+
+                var allPdfs = pdfs.concat(brand_pdfs).concat(industry_pdfs);
+
+                return allPdfs;
+            }
+
+            function getBrandCode() {
+                var brandSelect = document.getElementById("brandSelect");
+                return brandSelect.options[brandSelect.selectedIndex].value;
+            }
+
+            function getIndustyCode() {
+                var industrySelect = document.getElementById("industrySelect");
+                return industrySelect.options[industrySelect.selectedIndex].value;
+            }
+
+            function addOption(text, nodeValue, selectElement) {
+                var element = document.createElement("option");
+                element.textContent = text;
+                element.nodeValue = nodeValue;
+                selectElement.add(element);
+            }
+
+
+            function brandSelected() {
+
+                var brandCode = getBrandCode();
+                //console.log(brandCode);
+
+                // clear all options
+                var industrySelect = document.getElementById("industrySelect");
+                var length = industrySelect.options.length;
+                for (var ii = length - 1; ii >= 0; ii--) {
+                    industrySelect.remove(ii);
+                }
+
+                if (brandCode === "") {
+                    return;
+                }
+
+
+                var industries = brand_industry({ brand: brandCode }).distinct("industry");//.select("industry");
+
+                //      console.log(industries);
+
+                addOption("Choose...", "", industrySelect);
+                for (var i = 0; i < industries.length; i++) {
+                    addOption(industry({ industry: industries[i] }).first()["title"], industries[i], industrySelect);
+                }
+            }
+
+            function industrySelected() {
+                var pdfList = getPdfList(getBrandCode(), getIndustyCode());
+                console.log(pdfList);
+                var listElement = document.getElementById("pdfLinks");
+
+                while (listElement.firstChild) {
+                    listElement.removeChild(listElement.firstChild);
+                }
+
+                for (var i = 0; i < pdfList.length; i++) {
+                    var element = document.createElement("li");
+                    element.innerHTML = "<a href='" + pdfList[i] + "'>" + pdfList[i] + "</a>";
+                    listElement.appendChild(element);
+
+                }
+
+            }
+
+
+
+
+
+        </script>
+<h1>VTT101</h1>
+<div style="width:100%;">
+  	@*<p>Welcome <?php echo ucfirst(strtolower($userInfo['fname'])); ?> <?php echo ucfirst(strtolower($userInfo['lname'])); ?></p>*@
+    <p> <p>&nbsp;</p>
+    <p>&nbsp;</p>
+    <p>&nbsp;</p>
+    	<ul>
+        	 <select class="normal" id="brandSelect" onchange="brandSelected()">
+            <option value="">Choose...</option>
+            <option value="V" >Victor</option>
+            <option value="VTD" >Victor Thermal Dynamics</option>
+            <option value="VA">Victor ArcAir</option>
+            <option value="T">Tweco</option>
+            <option value="S">Stoody</option>
+        </select>
+                
+        <select id="industrySelect" onchange="industrySelected()">
+        </select>
+    	</ul>
+        
+        
+        <ul id="pdfLinks">
+        </ul>
+  </p>
+    <p>&nbsp;</p>
+    <p>&nbsp;</p>
+    <p>&nbsp;</p>
+    <p>&nbsp;</p>
+    <p>&nbsp;</p>
+    <p>&nbsp;</p>
+  <div style="clear:both;"></div>
+</div>
+</body>
+</html>
