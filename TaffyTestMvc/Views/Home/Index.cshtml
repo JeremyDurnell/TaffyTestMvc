@@ -38,13 +38,13 @@ ul li{ line-height:20px;}
 
 
 
-            function getPdfList(brands, i) {
+            function getPdfList(brands, industryCode) {
 
                 // --- THIS GIVES YOU PRODUCT PDFS
 
                 // brand : V, industry: AERO - I need a list of products
 
-                var V_1 = brand_industry({ brand: brands, industry: i });
+                var V_1 = brand_industry({ brand: brands, industry: industryCode });
                 var codes = V_1.select("code");
                 //   console.log(codes);
 
@@ -68,7 +68,7 @@ ul li{ line-height:20px;}
 
                 // --- THIS GIVES YOU INDUSTRY PDFS
 
-                var industry_pdfs = industry({ industry: i }).select("filename");
+                var industry_pdfs = industry({ industry: industryCode }).select("filename");
                 //   console.log(industry_pdfs);
                 //return industry_pdfs;
                 // ---
@@ -91,7 +91,7 @@ ul li{ line-height:20px;}
             function addOption(text, nodeValue, selectElement) {
                 var element = document.createElement("option");
                 element.textContent = text;
-                element.nodeValue = nodeValue;
+                element.value = nodeValue;
                 selectElement.add(element);
             }
 
@@ -119,7 +119,8 @@ ul li{ line-height:20px;}
 
                 addOption("Choose...", "", industrySelect);
                 for (var i = 0; i < industries.length; i++) {
-                    addOption(industry({ industry: industries[i] }).first()["title"], industries[i], industrySelect);
+                    var industryRecord = industry({ industry: industries[i] }).first();
+                    addOption(industryRecord["title"], industryRecord["industry"], industrySelect);
                 }
             }
 
